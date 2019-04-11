@@ -25,7 +25,7 @@ class DexList extends React.Component{
         //    .then(result => {return result.json()})
         //    .then(rowData => this.setState({rowData}))
         
-        axios.get('/pokemon')
+        axios.get('https://pokedextrackerapi.herokuapp.com/pokemon')
             .then(result => {return result.data;})
             .then(pokemon => {this.setState({rowData : pokemon});})
     }
