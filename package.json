@@ -2,7 +2,6 @@
   "name": "pokedex-tracker",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://pokedextrackerapi.herokuapp.com",
   "dependencies": {
     "ag-grid-community": "^19.1.4",
     "ag-grid-react": "^19.1.2",

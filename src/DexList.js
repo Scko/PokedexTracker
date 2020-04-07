@@ -11,30 +11,46 @@ class DexList extends React.Component{
 
         this.state = {
             columnDefs: [
-                {headerName: 'ID', field: 'id'},
-                {headerName: 'Name', field: 'name'},
-                {headerName: 'Number', field: 'number'}
-
+                { headerName: 'Sprite', field: 'sprites.front_default', cellRenderer: this.spriteCellRenderer },//autoHeight:true
+                { headerName: 'Name', field: 'name' },
+                { headerName: 'Number', field: 'id' }
             ],
-            rowData: []
-        }
+            rowData: [],
+            p: []
+        };
     }
 
     componentDidMount() {
-        //fetch('/pokemon')
-        //    .then(result => {return result.json()})
-        //    .then(rowData => this.setState({rowData}))
-        
-        axios.get('/pokemon')
-            .then(result => {return result.data;})
-            .then(pokemon => {this.setState({rowData : pokemon});})
+        axios.get('https://pokeapi.co/api/v2/pokemon/?limit=807')
+            .then(result => { return result.data.results; })
+            .then(
+                pokemon => {
+                    const p = Promise.all(pokemon.map( x => axios.get(`https://pokeapi.co/api/v2/pokemon/${x.name}`)));
+                    return p;
+                })
+            .then(
+                po => {
+                    let p = [];
+                    po.forEach((v, i) => { p.push(v.data); });
+                    this.setState({ rowData: p });
+                }
+            );
     }
 
+    spriteCellRenderer(params) {
+        if (params.value) {
+            const flag = "<img src=" + params.value + " />";
+            return flag;
+        } else {
+            return null;
+        }
+    }
 
     render(){
         return (
-            <div className="ag-theme-balham" style={{ height: '200px', width: '600px' }}>
+            <div className="ag-theme-balham" style={{ height: '500px', width: '600px' }}>
                 <AgGridReact
+                    rowHeight={125}
                     enableSorting={true}
                     enableFilter={true}
                     pagination={true}
