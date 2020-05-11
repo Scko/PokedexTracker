@@ -18,7 +18,7 @@ class DexList extends React.Component{
             columnDefs: [
                 {
                     headerName: 'Caught', field: 'caught', cellRenderer: params => {
-                        return `<input type='checkbox' ${params.value.caught ? 'checked' : ''} id='${params.value.name}'/>`;
+                        return `<input type='checkbox' ${params.value.caught ? 'checked' : ''} id='${params.value.name}' />`;
                     }
                 },
                 { headerName: 'Name', field: 'name' },
@@ -66,7 +66,12 @@ class DexList extends React.Component{
             .then(result => { return result.data.results; })
             .then(pokemon =>
             {
-                alreadyCaught = localStorage.getItem('pokemonCaught').split(",");
+                var pokemonCaught = localStorage.getItem('pokemonCaught');
+                if (pokemonCaught !== null) {
+                    alreadyCaught = pokemonCaught.split(",");
+                } else {
+                    alreadyCaught = [];
+                }
                 pokemon = pokemon.map(rd => ({ 'caught': { 'caught': alreadyCaught.includes(rd.name), 'name': rd.name }, 'name': rd.name }));
                 this.setState({ pokemonNameData: pokemon });
             });
@@ -139,9 +144,8 @@ class DexList extends React.Component{
         this.setState({ displayItems: items });
     }
 
-    updateTracker = e => {
-        var saveData = [...document.querySelectorAll('input:checked')].map(c => c.id).join(',');
-        localStorage.setItem('pokemonCaught', saveData );
+    updateTracker() {
+        localStorage.setItem('pokemonCaught', [...document.querySelectorAll('input:checked')].map(c => c.id) );
     }
 
     render(){
@@ -214,16 +218,47 @@ class DexList extends React.Component{
                 {
                     this.state.displayPokemon &&
                     <Container>
-                        {
-                            <Card>
-                                <Card.Img variant="top" src={this.state.pokemon.sprites.front_default} />
-                                <Card.Body>
-                                    <Card.Text>
-                                        {this.state.pokemon.name}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
-                        }
+                    {
+                    <div>
+                        <Card>
+                            <Card.Img variant="top" src={this.state.pokemon.sprites.front_default} />
+                            <Card.Body>
+                                <Card.Text>
+                                    {this.state.pokemon.name}
+                                </Card.Text>
+                            </Card.Body>
+                                    </Card>
+
+                                    <p>Types</p>
+                                    {this.state.pokemon.types.map(type =>
+                                        <p id={type.type.name}>
+                                            {type.type.name}
+
+                                        </p>
+                                    )}
+                        <p>Abilities</p>
+                        {this.state.pokemon.abilities.map(ability =>
+                            <p id={ability.ability.name}>
+                                {ability.ability.name}
+
+                            </p>
+                                    )}
+                                    <p>Stats</p>
+                                    {this.state.pokemon.stats.map(stat =>
+                                        <p id={stat.stat.name}>
+                                            {stat.base_stat} {stat.stat.name}
+
+                                        </p>
+                                    )}
+                        <p>Moves</p>
+                        {this.state.pokemon.moves.map(move =>
+                            <p id={move.move.name}>
+                                {move.move.name}
+
+                            </p>
+                        )}
+                    </div>
+                    }
                     </Container>
                 }
                 {
