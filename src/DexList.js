@@ -1,36 +1,65 @@
 import React from "react";
 import './DexList.css';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import 'react-tabs/style/react-tabs.css';
 import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
-import './TopBanner.css';
-import logo from './logo.svg';
-
+import logo from './pokeball.svg';
+import { MDBDataTable } from 'mdbreact';
 
 class DexList extends React.Component{
+
+
     constructor(props) {
-        super(props);
+        super(props); 
 
         this.state = {
-            columnDefs: [
-                {
-                    headerName: 'Caught', field: 'caught', cellRenderer: params => {
-                        return `<input type='checkbox' ${params.value.caught ? 'checked' : ''} id='${params.value.name}' />`;
-                    }
-                },
-                { headerName: 'Name', field: 'name' },
-               
-            ],
-            pokemonData: [],
             pokemonNameData: [],
+            renderedPokemon : {
+                columns: [
+                    {
+                        label: 'Caught',
+                        field: 'caught'
+                    },
+                    {
+                        label: 'Name',
+                        field: 'name'
+                    }
+                ],
+                rows: []
+            },
+            renderedMoves: {
+                columns: [
+                    { label: 'Name', field: 'name' },
+                    { label: 'Level', field: 'level' },
+                    { label: 'Method', field: 'method' },
+                    { label: 'Version', field: 'version' }
+                ],
+                rows: []
+            },
+            columnDefsMoves: [
+                { headerName: 'Name', field: 'name' },
+                { headerName: 'Level', field: 'level' },
+                { headerName: 'Method', field: 'method' },
+                { headerName: 'Version', field: 'version' }
+            ],
+            moveData: [],
+            rbMoves: [],
+            yMoves: [],
+            gsMoves: [],
+            cMoves: [],
+            orasMoves: [],
+            b2w2Moves: [],
+            bwMoves: [],
+            hgssMoves: [],
+            pMoves: [],
+            dpMoves: [],
+            usumMoves: [],
+            smMoves: [],
+            eMoves: [],
+            xyMoves: [],
+            pokemonData: [],
             itemData: [],
-            p: [],
-            pokemonNames: [],
-            displayMenu: false,
-            displayDexList: false,
             displayItems: false,
             displayPokemon: false,
             pokemon: {},
@@ -39,13 +68,13 @@ class DexList extends React.Component{
             displayTracker: false,
             width: 0,
             height: 0,
-            pokemonAlreadyCaught: []
         };
 
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        
     }
 
-
+    
     componentDidMount() {
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
@@ -66,15 +95,61 @@ class DexList extends React.Component{
             .then(result => { return result.data.results; })
             .then(pokemon =>
             {
-                var pokemonCaught = localStorage.getItem('pokemonCaught');
-                if (pokemonCaught !== null) {
-                    alreadyCaught = pokemonCaught.split(",");
-                } else {
-                    alreadyCaught = [];
-                }
-                pokemon = pokemon.map(rd => ({ 'caught': { 'caught': alreadyCaught.includes(rd.name), 'name': rd.name }, 'name': rd.name }));
+                alreadyCaught = this.getAlreadyCaught();
+
+                pokemon = pokemon.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name }));
                 this.setState({ pokemonNameData: pokemon });
+
+                this.updateRender(pokemon);
             });
+
+    }
+    setChecked(pokemonName) {
+        var alreadyCaught = this.updateAlreadyCaught(pokemonName);
+
+        var pokemon = this.state.pokemonNameData.map(rd => ({ 'caught':alreadyCaught.includes(rd.name), 'name': rd.name }));
+        this.setState({ pokemonNameData: pokemon });
+
+        this.updateRender(pokemon);
+    }
+
+    updateRender(pokemon)
+    {
+        pokemon = pokemon.map(rd => ({
+            'caught': <input type='checkbox' checked={rd.caught ? `checked` : ''} onChange={(e) => { this.setChecked(e.currentTarget.id); }} id={rd.name} />,
+            'name': <button id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name}</button>
+        }));
+        var temp = { ...this.state.renderedPokemon };
+        temp.rows = pokemon;
+        this.setState({ renderedPokemon: temp });
+    }
+
+    updateAlreadyCaught(pokemonName)
+    {
+        var alreadyCaught = this.getAlreadyCaught();
+
+        if (alreadyCaught.includes(pokemonName)) {
+            const index = alreadyCaught.indexOf(pokemonName);
+            if (index > -1) {
+                alreadyCaught.splice(index, 1);
+            }
+        } else {
+            alreadyCaught = alreadyCaught.concat(pokemonName);
+        }
+        localStorage.setItem('pokemonCaught', alreadyCaught);
+
+        return alreadyCaught;
+    }
+
+    getAlreadyCaught() {
+        let alreadyCaught;
+        var pokemonCaught = localStorage.getItem('pokemonCaught');
+        if (pokemonCaught !== null) {
+            alreadyCaught = pokemonCaught.split(",");
+        } else {
+            alreadyCaught = [];
+        }
+        return alreadyCaught;
     }
 
     getAllPokemon()
@@ -97,12 +172,39 @@ class DexList extends React.Component{
 
     getPokemon(name)
     {
+        //rbMoves: [],
+        //    yMoves: [],
+        //        gsMoves: [],
+        //            cMoves: [],
+        //                orasMoves: [],
+        //                    b2w2Moves: [],
+        //                        bwMoves: [],
+        //                            hgssMoves: [],
+        //                                pMoves: [],
+        //                                    dpMoves: [],
+        //                                        usumMoves: [],
+        //                                            smMoves: [],
+        //                                                eMoves: [],
+        //                                                    xyMoves: [],
         axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
             .then(result => { return result.data; })
             .then(
                 po => {
+                    var moves = po.moves.map(move => ({ 'name': move.move.name, 'versions': move.version_group_details }));
+                    let flatMoves = [];
+                    moves.forEach((m, i) =>
+                    {
+                        m.versions.forEach((v, i) => {
+                            flatMoves.push({ 'name': m.name, 'level':v.level_learned_at, 'method':v.move_learn_method.name , 'version':v.version_group.name });
+                        });
+                    });
+                   flatMoves.filter(m =>  m.version === 'firered-leafgreen');
+                    this.setState({ moveData: flatMoves });
+                    var temp = { ...this.state.renderedMoves };
+                    temp.rows = flatMoves;
+                    this.setState({ renderedMoves: temp });
                     this.setState({ pokemon: po });
-                    this.setState({ displayDexList: false });
+                    this.setState({ displayTracker: false });
                     this.setState({ displayPokemon: true });
                 }
             );
@@ -138,62 +240,27 @@ class DexList extends React.Component{
             );
     }
 
-    display(tracker=false, dexlist=false, items=false){
+    display(tracker=false, items=false){
         this.setState({ displayTracker: tracker });
-        this.setState({ displayDexList: dexlist });
         this.setState({ displayItems: items });
+        this.setState({ displayPokemon: false });
+        this.setState({ displayItems: false });
     }
-
-    updateTracker() {
-        localStorage.setItem('pokemonCaught', [...document.querySelectorAll('input:checked')].map(c => c.id) );
-    }
-
+    
     render(){
         return (
             <div>
                 <header className="App-header">
                     <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title" onClick={() => { this.display(); }}>Pokedex Tracker</h1>
-
-                    <h2 onClick={() => { this.getPokemonNames(); this.display(true); }}>Tracker</h2>
-                    <h2 onClick={() => { this.getAllPokemon(); this.display(false, true); }}>DexList</h2>
-                    <h2 onClick={() => { this.getAllItems(); this.display(false, false, true);}}>ItemList</h2>
+                    <h1 className="App-title" onClick={() => { this.display(); }}>Pokedex Tracker   </h1>
+                    <h2 className="App-title"  onClick={() => { this.getPokemonNames(); this.display(true); }}>Tracker </h2>
+                    <h2 className="App-title"  onClick={() => { this.getAllItems(); this.display(false, false, true);}}>ItemList</h2>
                 </header>
             <div>
                 {
-                    this.state.displayDexList &&
-                    <Container>
-                        {this.state.pokemonData.map(pokemon =>
-                            <button id={pokemon.name} onClick={(e) =>
-                            {
-                                this.getPokemon(e.currentTarget.id);
-                            }}>
-
-                            <Card>
-                                <Card.Img variant="top" src={pokemon.sprites.front_default} />
-                                <Card.Body>
-                                    <Card.Text>
-                                        {pokemon.name}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
-                            </button>
-                        )}
-                    </Container>
-                }
-                {
                     this.state.displayTracker && 
-                    <div className="ag-theme-balham" style={{ height: this.state.height, width: this.state.width }}>
-                        <button onClick={this.updateTracker}>Update Tracker!</button>
-                        <AgGridReact 
-                            rowSelection="multiple"
-                            onGridReady={params => this.gridApi = params.api}
-                            enableSorting={true}
-                            enableFilter={true}
-                            pagination={true}
-                            columnDefs={this.state.columnDefs}
-                            rowData={this.state.pokemonNameData}>
-                        </AgGridReact>
+                    <div>
+                        <MDBDataTable striped bordered hover paging={false} searching={false} data={this.state.renderedPokemon} />
                     </div>
                 }
                 {
@@ -215,51 +282,37 @@ class DexList extends React.Component{
                         )}
                     </Container>
                 }
-                {
-                    this.state.displayPokemon &&
-                    <Container>
                     {
-                    <div>
-                        <Card>
-                            <Card.Img variant="top" src={this.state.pokemon.sprites.front_default} />
-                            <Card.Body>
-                                <Card.Text>
-                                    {this.state.pokemon.name}
-                                </Card.Text>
-                            </Card.Body>
-                                    </Card>
+                        this.state.displayPokemon &&
+                        <div >
+                            <h1>{this.state.pokemon.name}</h1>
+                            <img src={this.state.pokemon.sprites.front_default} alt="default sprite" width="10%"/>
+                            <img src={this.state.pokemon.sprites.front_shiny} alt="shiny sprite" width="10%"/>
+                            <table >
+                                <tbody>
+                                    <tr><th colSpan="2">Types</th></tr>
+                                    <tr>{this.state.pokemon.types.map(type => <td>{type.type.name}</td>)}</tr>
+                                </tbody>
+                            </table>
 
-                                    <p>Types</p>
-                                    {this.state.pokemon.types.map(type =>
-                                        <p id={type.type.name}>
-                                            {type.type.name}
-
-                                        </p>
-                                    )}
-                        <p>Abilities</p>
-                        {this.state.pokemon.abilities.map(ability =>
-                            <p id={ability.ability.name}>
-                                {ability.ability.name}
-
-                            </p>
-                                    )}
-                                    <p>Stats</p>
-                                    {this.state.pokemon.stats.map(stat =>
-                                        <p id={stat.stat.name}>
-                                            {stat.base_stat} {stat.stat.name}
-
-                                        </p>
-                                    )}
-                        <p>Moves</p>
-                        {this.state.pokemon.moves.map(move =>
-                            <p id={move.move.name}>
-                                {move.move.name}
-
-                            </p>
-                        )}
-                    </div>
-                    }
-                    </Container>
+                            <table  >
+                                <tbody>
+                                    <tr><th colSpan="2">Abilities</th></tr>
+                                    <tr>{this.state.pokemon.abilities.map(ability => <td>{ability.ability.name}</td>)}</tr>
+                                </tbody>
+                            </table>
+                            
+                            <table  >
+                                <tbody>
+                                    <tr><th colSpan="6">Stats</th></tr>
+                                    <tr>{this.state.pokemon.stats.map(stat => <th>{stat.stat.name}</th>)}</tr>
+                                    <tr>{this.state.pokemon.stats.map(stat => <td>{stat.base_stat}</td>)}</tr>
+                                </tbody>
+                            </table>
+                                       
+                            <MDBDataTable striped bordered hover data={this.state.renderedMoves} />
+                        </div>
+                       
                 }
                 {
                     this.state.displayItem &&
