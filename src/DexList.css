@@ -28,7 +28,7 @@
     }
 }
 
-table {
+.center-table {
     table-layout: fixed;
     width: 50%;
     margin-left: auto;

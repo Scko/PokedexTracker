@@ -244,24 +244,26 @@ class DexList extends React.Component{
         this.setState({ displayTracker: tracker });
         this.setState({ displayItems: items });
         this.setState({ displayPokemon: false });
-        this.setState({ displayItems: false });
+        this.setState({ displayItem: false });
     }
     
     render(){
         return (
             <div>
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title" onClick={() => { this.display(); }}>Pokedex Tracker   </h1>
-                    <h2 className="App-title"  onClick={() => { this.getPokemonNames(); this.display(true); }}>Tracker </h2>
-                    <h2 className="App-title"  onClick={() => { this.getAllItems(); this.display(false, false, true);}}>ItemList</h2>
-                </header>
-            <div>
-                {
-                    this.state.displayTracker && 
+
                     <div>
-                        <MDBDataTable striped bordered hover paging={false} searching={false} data={this.state.renderedPokemon} />
+                    <header className="App-header" style={{ display: `flow-root` }}>
+                            <img src={logo} className="App-logo" alt="logo" />
+                            <h1 className="App-title" onClick={() => { this.display(); }}>Pokedex Tracker   </h1>
+                            <h2 className="App-title"  onClick={() => { this.getPokemonNames(); this.display(true); }}>Tracker </h2>
+                            <h2 className="App-title"  onClick={() => { this.getAllItems(); this.display(false, true);}}>ItemList</h2>
+                        </header>
                     </div>
+                {
+                        this.state.displayTracker &&
+                    <div >
+                            <MDBDataTable striped bordered hover paging={false} searching={false} data={this.state.renderedPokemon} />
+                        </div>
                 }
                 {
                     this.state.displayItems &&
@@ -288,21 +290,21 @@ class DexList extends React.Component{
                             <h1>{this.state.pokemon.name}</h1>
                             <img src={this.state.pokemon.sprites.front_default} alt="default sprite" width="10%"/>
                             <img src={this.state.pokemon.sprites.front_shiny} alt="shiny sprite" width="10%"/>
-                            <table >
+                            <table className="center-table">
                                 <tbody>
                                     <tr><th colSpan="2">Types</th></tr>
                                     <tr>{this.state.pokemon.types.map(type => <td>{type.type.name}</td>)}</tr>
                                 </tbody>
                             </table>
 
-                            <table  >
+                            <table className="center-table">
                                 <tbody>
                                     <tr><th colSpan="2">Abilities</th></tr>
                                     <tr>{this.state.pokemon.abilities.map(ability => <td>{ability.ability.name}</td>)}</tr>
                                 </tbody>
                             </table>
                             
-                            <table  >
+                            <table className="center-table">
                                 <tbody>
                                     <tr><th colSpan="6">Stats</th></tr>
                                     <tr>{this.state.pokemon.stats.map(stat => <th>{stat.stat.name}</th>)}</tr>
@@ -329,7 +331,6 @@ class DexList extends React.Component{
                         }
                     </Container>
                 }
-                </div>
                 </div>
         );
     }
