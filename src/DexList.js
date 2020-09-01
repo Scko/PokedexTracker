@@ -2,8 +2,6 @@ import React from "react";
 import './DexList.css';
 import 'react-tabs/style/react-tabs.css';
 import axios from 'axios';
-import Container from 'react-bootstrap/Container';
-import Card from 'react-bootstrap/Card';
 import logo from './pokeball.svg';
 import { MDBDataTable } from 'mdbreact';
 
@@ -78,7 +76,7 @@ class DexList extends React.Component{
     getPokemonNames()
     {
         let alreadyCaught;
-        axios.get('https://pokeapi.co/api/v2/pokemon/?limit=802')
+        axios.get('https://pokeapi.co/api/v2/pokemon/?limit=892')
             .then(result => { return result.data.results; })
             .then(pokemon =>
             {
@@ -142,7 +140,7 @@ class DexList extends React.Component{
 
     getAllPokemon()
     {
-        axios.get('https://pokeapi.co/api/v2/pokemon/?limit=802')
+        axios.get('https://pokeapi.co/api/v2/pokemon/?limit=892')
             .then(result => { return result.data.results; })
             .then(
                 pokemon => {
