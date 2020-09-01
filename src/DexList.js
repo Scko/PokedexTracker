@@ -19,11 +19,11 @@ class DexList extends React.Component{
                 columns: [
                     {
                         label: 'Caught',
-                        field: 'caught'
+                        field: 'caught',
                     },
                     {
                         label: 'Name',
-                        field: 'name'
+                        field: 'name',
                     }
                 ],
                 rows: []
@@ -44,20 +44,6 @@ class DexList extends React.Component{
                 { headerName: 'Version', field: 'version' }
             ],
             moveData: [],
-            rbMoves: [],
-            yMoves: [],
-            gsMoves: [],
-            cMoves: [],
-            orasMoves: [],
-            b2w2Moves: [],
-            bwMoves: [],
-            hgssMoves: [],
-            pMoves: [],
-            dpMoves: [],
-            usumMoves: [],
-            smMoves: [],
-            eMoves: [],
-            xyMoves: [],
             pokemonData: [],
             itemData: [],
             displayItems: false,
@@ -65,7 +51,7 @@ class DexList extends React.Component{
             pokemon: {},
             displayItem: false,
             item: {},
-            displayTracker: false,
+            displayTracker: true,
             width: 0,
             height: 0,
         };
@@ -78,6 +64,7 @@ class DexList extends React.Component{
     componentDidMount() {
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
+        this.getPokemonNames();
     }
 
     componentWillUnmount() {
@@ -97,7 +84,7 @@ class DexList extends React.Component{
             {
                 alreadyCaught = this.getAlreadyCaught();
 
-                pokemon = pokemon.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name }));
+                pokemon = pokemon.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name, 'hiddenName' : rd.name }));
                 this.setState({ pokemonNameData: pokemon });
 
                 this.updateRender(pokemon);
@@ -107,7 +94,7 @@ class DexList extends React.Component{
     setChecked(pokemonName) {
         var alreadyCaught = this.updateAlreadyCaught(pokemonName);
 
-        var pokemon = this.state.pokemonNameData.map(rd => ({ 'caught':alreadyCaught.includes(rd.name), 'name': rd.name }));
+        var pokemon = this.state.pokemonNameData.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name, 'hiddenName': rd.name }));
         this.setState({ pokemonNameData: pokemon });
 
         this.updateRender(pokemon);
@@ -117,7 +104,8 @@ class DexList extends React.Component{
     {
         pokemon = pokemon.map(rd => ({
             'caught': <input type='checkbox' checked={rd.caught ? `checked` : ''} onChange={(e) => { this.setChecked(e.currentTarget.id); }} id={rd.name} />,
-            'name': <button id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name}</button>
+            'name': <button className="fill" id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name} </button>,
+            'hiddenName': rd.hiddenName 
         }));
         var temp = { ...this.state.renderedPokemon };
         temp.rows = pokemon;
@@ -172,20 +160,6 @@ class DexList extends React.Component{
 
     getPokemon(name)
     {
-        //rbMoves: [],
-        //    yMoves: [],
-        //        gsMoves: [],
-        //            cMoves: [],
-        //                orasMoves: [],
-        //                    b2w2Moves: [],
-        //                        bwMoves: [],
-        //                            hgssMoves: [],
-        //                                pMoves: [],
-        //                                    dpMoves: [],
-        //                                        usumMoves: [],
-        //                                            smMoves: [],
-        //                                                eMoves: [],
-        //                                                    xyMoves: [],
         axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
             .then(result => { return result.data; })
             .then(
@@ -254,40 +228,20 @@ class DexList extends React.Component{
                     <div>
                     <header className="App-header" style={{ display: `flow-root` }}>
                             <img src={logo} className="App-logo" alt="logo" />
-                            <h1 className="App-title" onClick={() => { this.display(); }}>Pokedex Tracker   </h1>
-                            <h2 className="App-title"  onClick={() => { this.getPokemonNames(); this.display(true); }}>Tracker </h2>
-                            <h2 className="App-title"  onClick={() => { this.getAllItems(); this.display(false, true);}}>ItemList</h2>
+                            <h2 className="App-title"  onClick={() => { this.getPokemonNames(); this.display(true); }}>PokedexTracker</h2>
                         </header>
                     </div>
-                {
+                    {
                         this.state.displayTracker &&
-                    <div >
-                            <MDBDataTable striped bordered hover paging={false} searching={false} data={this.state.renderedPokemon} />
+                        <div className="center-table-sm">
+                            <MDBDataTable striped bordered hover paging={false} searching={true} data={this.state.renderedPokemon}/>
                         </div>
-                }
-                {
-                    this.state.displayItems &&
-                    <Container>
-                        {this.state.itemData.map(item =>
-                            <button id={item.name} onClick={(e) => {
-                                this.getItem(e.currentTarget.id);
-                            }}>
-                            <Card>
-                                <Card.Img variant="top" src={item.sprites.default} />
-                                <Card.Body>
-                                    <Card.Text>
-                                        {item.name}
-                                    </Card.Text>
-                                </Card.Body>
-                                </Card>
-                                </button>
-                        )}
-                    </Container>
-                }
+                    }
                     {
                         this.state.displayPokemon &&
                         <div >
-                            <h1>{this.state.pokemon.name}</h1>
+                        <h1>{this.state.pokemon.name}</h1>
+                        <img src={this.state.pokemon.sprites.other['official-artwork'].front_default} alt="official art" />
                             <img src={this.state.pokemon.sprites.front_default} alt="default sprite" width="10%"/>
                             <img src={this.state.pokemon.sprites.front_shiny} alt="shiny sprite" width="10%"/>
                             <table className="center-table">
@@ -314,24 +268,8 @@ class DexList extends React.Component{
                                        
                             <MDBDataTable striped bordered hover data={this.state.renderedMoves} />
                         </div>
-                       
                 }
-                {
-                    this.state.displayItem &&
-                    <Container>
-                        {
-                            <Card>
-                                <Card.Img variant="top" src={this.state.item.sprites.default} />
-                                <Card.Body>
-                                    <Card.Text>
-                                        {this.state.item.name}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
-                        }
-                    </Container>
-                }
-                </div>
+            </div>
         );
     }
 

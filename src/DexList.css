@@ -34,7 +34,18 @@
     margin-left: auto;
     margin-right: auto;
 }
+.center-table-sm {
+    table-layout: fixed;
+    width: 30%;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 td {
     width: 25%;
+}
+
+.fill {
+    width: 100%;
+    height: 100%;
 }
