@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
-import DexList from './DexList';
+import { BrowserRouter } from "react-router-dom";
+import Root from './Root';
 
 class App extends Component {
   render() {
-    return (
-      <div className="App">
-        <DexList />
-      </div>
+      return (
+          <BrowserRouter>
+              <div className="App">
+                  <Root />
+              </div>
+          </BrowserRouter>
+     
     );
   }
 }

@@ -2,16 +2,15 @@ import React from "react";
 import './DexList.css';
 import 'react-tabs/style/react-tabs.css';
 import axios from 'axios';
-import logo from './pokeball.svg';
 import { MDBDataTable } from 'mdbreact';
-import Pokemon from './Pokemon';
+import { Link } from "react-router-dom";
+
 class DexList extends React.Component{
 
     constructor(props) {
         super(props); 
 
         this.state = {
-            pokemon: {},
             pokemonNames: [],
             renderedPokemon : {
                 columns: [
@@ -86,7 +85,8 @@ class DexList extends React.Component{
     updateRender(pokemon){
         pokemon = pokemon.map(rd => ({
             'caught': <input type='checkbox' checked={rd.caught ? `checked` : ''} onChange={(e) => { this.setChecked(e.currentTarget.id); }} id={rd.name} />,
-            'name': <button className="fill" id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name} </button>,
+            //'name': <button className="fill" id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name} </button>,
+            'name': <Link to={`/dexlist/${rd.name}`}> {rd.name}</Link>,
             'hiddenName': rd.hiddenName 
         }));
         var temp = { ...this.state.renderedPokemon };
@@ -120,49 +120,15 @@ class DexList extends React.Component{
         }
         return alreadyCaught;
     }
-
-    getPokemon(name) {
-        axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
-            .then(result => { return result.data; })
-            .then(
-                po => {
-                    var moves = po.moves.map(move => ({ 'name': move.move.name, 'versions': move.version_group_details }));
-                    let flatMoves = [];
-                    moves.forEach((m, i) => {
-                        m.versions.forEach((v, i) => {
-                            flatMoves.push({ 'name': m.name, 'level': v.level_learned_at, 'method': v.move_learn_method.name, 'version': v.version_group.name });
-                        });
-                    });
-                    var temp = { ...this.state.renderedMoves };
-                    temp.rows = flatMoves;
-                    this.setState({ renderedMoves: temp });
-                    this.setState({ pokemon: po });
-                    this.setState({ displayTracker: false });
-                    this.setState({ displayPokemon: true });
-                }
-            );
-    }
     
     render(){
         return (
             <div>
 
-                    <div>
-                    <header className="App-header" style={{ display: `flow-root` }}>
-                        <img src={logo} className="App-logo" alt="logo" />
-                        <h2 className="App-title" onClick={() => { this.getPokemonNames(); this.setState({ displayTracker: true }); this.setState({ displayPokemon: false }); }}>PokedexTracker</h2>
-                        </header>
-                    </div>
-                    {
-                        this.state.displayTracker &&
-                        <div className="center-table-sm">
-                            <MDBDataTable striped bordered hover paging={false} searching={true} data={this.state.renderedPokemon}/>
-                        </div>
-                    }
-                {
-                    this.state.displayPokemon &&
-                    <Pokemon pokemon={this.state.pokemon} renderedMoves={this.state.renderedMoves} />
-                }
+                <div className="center-table-sm">
+                    <MDBDataTable striped bordered hover paging={false} searching={true} data={this.state.renderedPokemon}/>
+                </div>
+            
             </div>
         );
     }
