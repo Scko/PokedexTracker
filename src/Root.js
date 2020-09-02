@@ -4,7 +4,7 @@ import { Link, Route, Switch } from "react-router-dom";
 import About from "./About";
 import DexList from "./DexList";
 import Pokemon from "./Pokemon";
-
+import './Root.css';
 import logo from './pokeball.svg';
 
 
@@ -13,11 +13,15 @@ const Root = () => {
         <div>
             <div>
                 <header className="App-header" style={{ display: `flow-root` }}>
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <div>
-                        <h2 className="App-title"> <Link to="/dexlist">DexList</Link></h2>
-                        <h2 className="App-title"> <Link to="/about">About</Link></h2>
+                    <div className="center">
+                        <img src={logo} className="App-logo" alt="logo" />
+                        <div>
+                            <h2 className="App-title"> <Link to="/dexlist">DexList</Link></h2>
+                            <h2 className="App-title"> <Link to="/about">About</Link></h2>
+                        </div>
                     </div>
+
+                    
                 </header>
             </div>
             

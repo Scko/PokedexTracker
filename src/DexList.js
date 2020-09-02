@@ -65,7 +65,7 @@ class DexList extends React.Component{
             {
                 alreadyCaught = this.getAlreadyCaught();
 
-                pokemon = pokemon.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name, 'hiddenName' : rd.name }));
+                pokemon = pokemon.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': this.Capitalize(rd.name), 'hiddenName' : rd.name }));
                 this.setState({ pokemonNames: pokemon });
 
                 this.updateRender(pokemon);
@@ -73,10 +73,14 @@ class DexList extends React.Component{
 
     }
 
-    setChecked(pokemonName) {
-        var alreadyCaught = this.updateAlreadyCaught(pokemonName);
+    Capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 
-        var pokemon = this.state.pokemonNames.map(rd => ({ 'caught': alreadyCaught.includes(rd.name), 'name': rd.name, 'hiddenName': rd.name }));
+    setChecked(pokemonName) {
+        var alreadyCaught = this.updateAlreadyCaught(pokemonName.toLowerCase());
+
+        var pokemon = this.state.pokemonNames.map(rd => ({ 'caught': alreadyCaught.includes(rd.name.toLowerCase()), 'name': this.Capitalize(rd.name), 'hiddenName': rd.name }));
         this.setState({ pokemonNames: pokemon });
 
         this.updateRender(pokemon);
@@ -84,9 +88,8 @@ class DexList extends React.Component{
 
     updateRender(pokemon){
         pokemon = pokemon.map(rd => ({
-            'caught': <input type='checkbox' checked={rd.caught ? `checked` : ''} onChange={(e) => { this.setChecked(e.currentTarget.id); }} id={rd.name} />,
-            //'name': <button className="fill" id={rd.name} onClick={(e) => { this.getPokemon(e.currentTarget.id); }}> {rd.name} </button>,
-            'name': <Link to={`/dexlist/${rd.name}`}> {rd.name}</Link>,
+            'caught': <input type='checkbox' checked={rd.caught ? `checked` : ''} onChange={(e) => { this.setChecked(e.currentTarget.id.toLowerCase()); }} id={rd.name} />,
+            'name': <Link to={`/dexlist/${rd.name.toLowerCase()}`}> {this.Capitalize(rd.name)}</Link>,
             'hiddenName': rd.hiddenName 
         }));
         var temp = { ...this.state.renderedPokemon };
@@ -97,13 +100,13 @@ class DexList extends React.Component{
     updateAlreadyCaught(pokemonName){
         var alreadyCaught = this.getAlreadyCaught();
 
-        if (alreadyCaught.includes(pokemonName)) {
-            const index = alreadyCaught.indexOf(pokemonName);
+        if (alreadyCaught.includes(pokemonName.toLowerCase())) {
+            const index = alreadyCaught.indexOf(pokemonName.toLowerCase());
             if (index > -1) {
                 alreadyCaught.splice(index, 1);
             }
         } else {
-            alreadyCaught = alreadyCaught.concat(pokemonName);
+            alreadyCaught = alreadyCaught.concat(pokemonName.toLowerCase());
         }
         localStorage.setItem('pokemonCaught', alreadyCaught);
 
@@ -114,7 +117,7 @@ class DexList extends React.Component{
         let alreadyCaught;
         var pokemonCaught = localStorage.getItem('pokemonCaught');
         if (pokemonCaught !== null) {
-            alreadyCaught = pokemonCaught.split(",");
+            alreadyCaught = pokemonCaught.toLowerCase().split(",");
         } else {
             alreadyCaught = [];
         }
@@ -124,11 +127,9 @@ class DexList extends React.Component{
     render(){
         return (
             <div>
-
                 <div className="center-table-sm">
                     <MDBDataTable striped bordered hover paging={false} searching={true} data={this.state.renderedPokemon}/>
                 </div>
-            
             </div>
         );
     }

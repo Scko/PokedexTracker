@@ -17,6 +17,14 @@
     float: left;
     padding: 30px;
 }
+.center {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+} 
+a {
+    color: black!important;
+}
 @keyframes App-logo-spin {
     from {
         transform: rotate(0deg);
