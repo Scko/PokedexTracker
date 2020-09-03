@@ -26,7 +26,7 @@ class Root extends React.Component {
                             <img src={logo} className="App-logo" alt="logo" />
                             <Link to="/dexlist">DexList</Link>
                             <Link to="/about">About</Link>
-                            <a href="javascript:void(0);" className="icon" onClick={() => { this.myFunction(); }}>&#9776;</a>
+                            <a className="icon" onClick={() => { this.myFunction(); }}>&#9776;</a>
                         </div>
                 </div>
                 </header>
